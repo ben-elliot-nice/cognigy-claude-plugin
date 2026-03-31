@@ -71,6 +71,7 @@ async function main(): Promise<void> {
 
   const flags = parseFlags([thirdArg ?? '', ...rest].filter(Boolean))
   const explicitEnvPath = flags['env-path']
+  delete flags['env-path']  // don't forward meta-flags to resource handlers
 
   // Resolve .env
   let envPath: string

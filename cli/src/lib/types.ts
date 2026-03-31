@@ -14,8 +14,8 @@ export interface CognigyClient {
 
 export type ResourceHandlers = {
   get?: (id: string, client: CognigyClient, env: EnvConfig) => Promise<unknown>
-  create?: (params: Record<string, unknown>, client: CognigyClient, env: EnvConfig) => Promise<unknown>
-  update?: (id: string, params: Record<string, unknown>, client: CognigyClient, env: EnvConfig) => Promise<unknown>
+  create?: (params: Record<string, string>, client: CognigyClient, env: EnvConfig) => Promise<unknown>
+  update?: (id: string, params: Record<string, string>, client: CognigyClient, env: EnvConfig) => Promise<unknown>
   delete?: (id: string, client: CognigyClient, env: EnvConfig) => Promise<void>
 }
 
