@@ -1,0 +1,42 @@
+import type { CognigyClient, EnvConfig, ResourceHandlers } from '../lib/types.js'
+
+export interface Flow {
+  _id: string
+  name: string
+  description?: string
+  projectId: string
+  isTrainingOutOfDate?: boolean
+  createdAt?: string
+  updatedAt?: string
+}
+
+function resolveProjectId(params: Record<string, string>, env: EnvConfig): string {
+  const id = params['projectId'] ?? env.projectId
+  if (!id) throw new Error('projectId is required — set COGNIGY_PROJECT_ID in .env or pass --projectId')
+  return id
+}
+
+export const flows: ResourceHandlers = {
+  async list(client, env) {
+    if (!env.projectId) throw new Error('projectId is required for list — set COGNIGY_PROJECT_ID in .env')
+    return client.get<Flow[]>(`/flows?projectId=${env.projectId}`)
+  },
+
+  async get(id, client) {
+    return client.get<Flow>(`/flows/${id}`)
+  },
+
+  async create(params, client, env) {
+    const projectId = resolveProjectId(params, env)
+    const { projectId: _omit, ...rest } = params
+    return client.post<Flow>('/flows', { ...rest, projectId })
+  },
+
+  async update(id, params, client) {
+    return client.patch<Flow>(`/flows/${id}`, params)
+  },
+
+  async delete(id, client) {
+    return client.delete(`/flows/${id}`)
+  },
+}
