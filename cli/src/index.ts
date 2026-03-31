@@ -102,6 +102,11 @@ async function main(): Promise<void> {
   const id = thirdArg && !thirdArg.startsWith('--') ? thirdArg : undefined
 
   switch (verb) {
+    case 'list': {
+      if (!handlers.list) fail(`Resource "${resource}" does not support list`)
+      output(await handlers.list(client, env))
+      break
+    }
     case 'get': {
       if (!id) fail(`get requires an ID: cognigy get ${resource} <id>`)
       if (!handlers.get) fail(`Resource "${resource}" does not support get`)
@@ -127,7 +132,7 @@ async function main(): Promise<void> {
       break
     }
     default:
-      fail(`Unknown verb: "${verb}". Valid verbs: get, create, update, delete`)
+      fail(`Unknown verb: "${verb}". Valid verbs: list, get, create, update, delete`)
   }
 }
 
