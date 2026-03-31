@@ -1,13 +1,16 @@
 import type { CognigyClient, EnvConfig } from './types.js'
 
 export function createClient(env: EnvConfig): CognigyClient {
-  const headers: Record<string, string> = {
+  const baseHeaders: Record<string, string> = {
     'Authorization': `Bearer ${env.apiToken}`,
-    'Content-Type': 'application/json',
   }
 
   async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
     const url = `${env.baseUrl}/v2.0${path}`
+    const headers: Record<string, string> = {
+      ...baseHeaders,
+      ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
+    }
     const res = await fetch(url, {
       method,
       headers,

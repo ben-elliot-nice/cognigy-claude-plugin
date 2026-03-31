@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { createClient } from './client.js'
 import type { EnvConfig } from './types.js'
 
@@ -19,6 +19,10 @@ function mockFetch(status: number, body: unknown) {
 describe('createClient', () => {
   beforeEach(() => {
     vi.stubGlobal('fetch', mockFetch(200, { _id: 'abc' }))
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
   })
 
   it('GET sets Authorization header and calls correct URL', async () => {
@@ -50,7 +54,10 @@ describe('createClient', () => {
     await client.patch('/flows/abc', { name: 'Renamed' })
     expect(fetch).toHaveBeenCalledWith(
       'https://app.cognigy.ai/v2.0/flows/abc',
-      expect.objectContaining({ method: 'PATCH' })
+      expect.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify({ name: 'Renamed' }),
+      })
     )
   })
 
