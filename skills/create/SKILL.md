@@ -12,9 +12,7 @@ Use this skill when the user wants to create a new resource.
 
 ## Steps
 
-1. Identify the resource type and required fields. Ask the user for any required fields that are missing before proceeding.
-
-   For `flow`: requires `--name`. Optional: `--description`, `--projectId` (overrides `.env` default).
+1. Identify the resource type and required fields. Ask the user for any required fields that are missing before proceeding. Check `cli/src/resources/<resource>.ts` in the plugin directory for the fields each resource accepts. Do not invent field names.
 
 2. Run the CLI:
 ```bash
@@ -23,7 +21,7 @@ npx tsx ~/.claude/plugins/cognigy-claude-plugin/cli/src/index.ts create <resourc
 
 3. Check the result:
    - **Exit 0** — success. The JSON output contains the created resource including its `_id`. Capture the `_id` if this is part of a composite workflow.
-   - **Exit 2** — `.env` found via git root walk. Show path, ask confirmation, re-run with `--env-path <path>` if confirmed.
+   - **Exit 2** — `.env` found via git root walk. Output contains `{ "requiresConfirmation": true, "path": "..." }`. Show the user the path and ask: *"I found a .env at `<path>` — OK to use this for the Cognigy connection?"* If confirmed, re-run adding `--env-path <path>`. If declined, stop.
    - **Exit 1** — error. Show the `error` field.
      - `projectId is required` → set `COGNIGY_PROJECT_ID` in `.env` or pass `--projectId`
 

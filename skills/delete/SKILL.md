@@ -23,7 +23,7 @@ npx tsx ~/.claude/plugins/cognigy-claude-plugin/cli/src/index.ts delete <resourc
 
 4. Check the result:
    - **Exit 0** — success. Output: `{ "deleted": true, "resource": "...", "id": "..." }`. Confirm to the user.
-   - **Exit 2** — `.env` found via git root walk. Show path, ask confirmation, re-run with `--env-path <path>` if confirmed.
+   - **Exit 2** — `.env` found via git root walk. Output contains `{ "requiresConfirmation": true, "path": "..." }`. Show the user the path and ask: *"I found a .env at `<path>` — OK to use this for the Cognigy connection?"* If confirmed, re-run adding `--env-path <path>`. If declined, stop.
    - **Exit 1** — error. Show the `error` field.
 
 ## Notes

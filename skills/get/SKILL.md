@@ -21,7 +21,7 @@ npx tsx ~/.claude/plugins/cognigy-claude-plugin/cli/src/index.ts get <resource> 
 
 3. Check the result:
    - **Exit 0** — success. Parse and present the JSON to the user, or pass it to the next step in a composite workflow.
-   - **Exit 2** — `.env` found via git root walk. Show path, ask confirmation, re-run with `--env-path <path>` if confirmed.
+   - **Exit 2** — `.env` found via git root walk. Output contains `{ "requiresConfirmation": true, "path": "..." }`. Show the user the path and ask: *"I found a .env at `<path>` — OK to use this for the Cognigy connection?"* If confirmed, re-run adding `--env-path <path>`. If declined, stop.
    - **Exit 1** — error. Show the `error` field.
      - `No .env file found` → ask user to run init: `npx tsx ~/.claude/plugins/cognigy-claude-plugin/cli/src/index.ts init`
      - `API error 401` → token invalid or expired
