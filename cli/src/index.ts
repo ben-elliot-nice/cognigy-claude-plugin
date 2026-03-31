@@ -2,9 +2,12 @@
 import { findEnvFile, loadEnv } from './lib/env.js'
 import { createClient } from './lib/client.js'
 import type { ResourceRegistry } from './lib/types.js'
+import { flows } from './resources/flows.js'
 
 // Resource registry — add new modules here as they're generated
-const registry: ResourceRegistry = {}
+const registry: ResourceRegistry = {
+  flow: flows,
+}
 
 function parseFlags(args: string[]): Record<string, string> {
   const flags: Record<string, string> = {}
