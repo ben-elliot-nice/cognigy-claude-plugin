@@ -35,6 +35,11 @@ describe('findEnvFile', () => {
     const result = findEnvFile(subdir)
     expect(result).toEqual({ path: join(root, '.env'), fromWalk: true })
   })
+
+  it('returns null when startDir does not exist', () => {
+    const result = findEnvFile('/nonexistent/path/that/cannot/exist')
+    expect(result).toBeNull()
+  })
 })
 
 describe('loadEnv', () => {

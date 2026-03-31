@@ -6,7 +6,12 @@ import type { EnvConfig, EnvFindResult } from './types.js'
 
 export function findEnvFile(startDir: string): EnvFindResult | null {
   // Resolve symlinks so paths are canonical on macOS (/var → /private/var)
-  const realStartDir = realpathSync(startDir)
+  let realStartDir: string
+  try {
+    realStartDir = realpathSync(startDir)
+  } catch {
+    return null
+  }
   const cwdEnv = resolve(realStartDir, '.env')
   if (existsSync(cwdEnv)) {
     return { path: cwdEnv, fromWalk: false }
