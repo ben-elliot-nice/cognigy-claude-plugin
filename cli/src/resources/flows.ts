@@ -1,14 +1,6 @@
 import type { CognigyClient, EnvConfig, ResourceHandlers } from '../lib/types.js'
-
-export interface Flow {
-  _id: string
-  name: string
-  description?: string
-  projectId: string
-  isTrainingOutOfDate?: boolean
-  createdAt?: string
-  updatedAt?: string
-}
+import type { Flow, CreateFlowInput, UpdateFlowInput } from './flow.types.js'
+export type { Flow }
 
 function resolveProjectId(params: Record<string, string>, env: EnvConfig): string {
   const id = params['projectId'] ?? env.projectId
