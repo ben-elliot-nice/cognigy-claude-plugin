@@ -25,14 +25,14 @@ describe('createClient', () => {
     vi.unstubAllGlobals()
   })
 
-  it('GET sets Authorization header and calls correct URL', async () => {
+  it('GET sets X-API-Key header and calls correct URL', async () => {
     const client = createClient(env)
     await client.get('/flows/abc')
     expect(fetch).toHaveBeenCalledWith(
       'https://app.cognigy.ai/v2.0/flows/abc',
       expect.objectContaining({
         method: 'GET',
-        headers: expect.objectContaining({ Authorization: 'Bearer test-token' }),
+        headers: expect.objectContaining({ 'X-API-Key': 'test-token' }),
       })
     )
   })
