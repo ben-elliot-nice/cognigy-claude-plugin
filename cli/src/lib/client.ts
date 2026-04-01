@@ -2,7 +2,7 @@ import type { CognigyClient, EnvConfig } from './types.js'
 
 export function createClient(env: EnvConfig): CognigyClient {
   const baseHeaders: Record<string, string> = {
-    'Authorization': `Bearer ${env.apiToken}`,
+    'X-API-Key': `${env.apiToken}`,
   }
 
   async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
