@@ -4,11 +4,13 @@ import { createClient } from './lib/client.js'
 import type { ResourceRegistry } from './lib/types.js'
 import { flows } from './resources/flows.js'
 import { projects } from './resources/projects.js'
+import { charts } from './resources/charts.js'
 
 // Resource registry — add new modules here as they're generated
 const registry: ResourceRegistry = {
   flow: flows,
   project: projects,
+  chart: charts,
 }
 
 function parseFlags(args: string[]): Record<string, string> {
