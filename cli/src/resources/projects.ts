@@ -1,11 +1,6 @@
 import type { CognigyClient, EnvConfig, ResourceHandlers } from '../lib/types.js'
-
-export interface Project {
-  _id: string
-  name: string
-  color?: string
-  locale?: string
-}
+import type { Project, CreateProjectInput, UpdateProjectInput } from './project.types.js'
+export type { Project }
 
 export const projects: ResourceHandlers = {
   async list(client) {
