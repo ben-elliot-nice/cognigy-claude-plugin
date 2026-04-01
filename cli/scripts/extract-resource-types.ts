@@ -103,11 +103,13 @@ function inferType(schema: any, indent: string): string {
   const resolved = resolveRef(schema)
   if (!resolved) return 'unknown'
 
+  const nullSuffix = resolved.nullable ? ' | null' : ''
+
   if (resolved.oneOf) {
     if (isPureEnumOneOf(resolved.oneOf)) {
       const values = resolved.oneOf.flatMap((v: any) => v.enum as string[])
       const deduped = [...new Set(values)]
-      return (deduped as string[]).map(v => JSON.stringify(v)).join(' | ')
+      return (deduped as string[]).map(v => JSON.stringify(v)).join(' | ') + nullSuffix
     }
     return 'unknown // TODO: oneOf — see OpenAPI spec'
   }
@@ -125,36 +127,35 @@ function inferType(schema: any, indent: string): string {
   }
 
   if (resolved.enum) {
-    return (resolved.enum as any[]).map(v => JSON.stringify(v)).join(' | ')
+    return (resolved.enum as any[]).map(v => JSON.stringify(v)).join(' | ') + nullSuffix
   }
 
   if (resolved.type === 'array') {
     const itemType = resolved.items ? inferType(resolved.items, indent) : 'unknown'
-    return `${itemType}[]`
+    return `${itemType}[]${nullSuffix}`
   }
 
   if (resolved.type === 'object' || resolved.properties) {
     if (!resolved.properties || Object.keys(resolved.properties).length === 0) {
-      return 'Record<string, unknown>'
+      return `Record<string, unknown>${nullSuffix}`
     }
     const required: string[] = resolved.required ?? []
     const childIndent = indent + '  '
     const lines = Object.entries(resolved.properties).map(([key, val]) => {
       const optional = required.includes(key) ? '' : '?'
-      const type = inferType(val as any, childIndent)
-      const nullable = (val as any).nullable ? ' | null' : ''
-      return `${childIndent}${key}${optional}: ${type}${nullable}`
+      const type = inferType(val as any, childIndent)  // val passed as-is; resolveRef called at top of inferType
+      // nullable for this property is handled inside the recursive inferType call
+      return `${childIndent}${key}${optional}: ${type}`
     })
-    return `{\n${lines.join('\n')}\n${indent}}`
+    return `{\n${lines.join('\n')}\n${indent}}${nullSuffix}`
   }
 
-  const nullable = resolved.nullable ? ' | null' : ''
   switch (resolved.type) {
-    case 'string':  return `string${nullable}`
+    case 'string':  return `string${nullSuffix}`
     case 'number':
-    case 'integer': return `number${nullable}`
-    case 'boolean': return `boolean${nullable}`
-    default:        return `unknown${nullable}`
+    case 'integer': return `number${nullSuffix}`
+    case 'boolean': return `boolean${nullSuffix}`
+    default:        return `unknown${nullSuffix}`
   }
 }
 
@@ -169,8 +170,7 @@ function generateInterface(name: string, schema: any, allOptional: boolean): str
   const props = Object.entries(resolved.properties ?? {}).map(([key, val]) => {
     const optional = required.includes(key) ? '' : '?'
     const type = inferType(val as any, '  ')
-    const nullable = (val as any).nullable ? ' | null' : ''
-    return `  ${key}${optional}: ${type}${nullable}`
+    return `  ${key}${optional}: ${type}`
   })
   return `export interface ${name} {\n${props.join('\n')}\n}`
 }
