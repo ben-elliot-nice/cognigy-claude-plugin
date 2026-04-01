@@ -28,7 +28,7 @@ npx tsx <plugin-root>/cli/src/index.ts list <resource>
    - **Exit 0** — success. Parse and present the JSON array to the user.
    - **Exit 2** — `.env` found via git root walk. Output contains `{ "requiresConfirmation": true, "path": "..." }`. Show the user the path and ask: *"I found a .env at `<path>` — OK to use this for the Cognigy connection?"* If confirmed, re-run adding `--env-path <path>`. If declined, stop.
    - **Exit 1** — error. Show the `error` field. Common fixes:
-     - `No .env file found` → ask user to run the CLI init command first: `npx tsx <plugin-root>/cli/src/index.ts init`
+     - `No .env file found` → invoke the `cognigy:init` skill to set up the connection, then retry this command
      - `projectId is required` → set `COGNIGY_PROJECT_ID` in `.env`
      - `API error 401` → API token in `.env` is invalid or expired
 

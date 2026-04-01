@@ -30,6 +30,7 @@ npx tsx <plugin-root>/cli/src/index.ts delete <resource> <id>
    - **Exit 0** — success. Output: `{ "deleted": true, "resource": "...", "id": "..." }`. Confirm to the user.
    - **Exit 2** — `.env` found via git root walk. Output contains `{ "requiresConfirmation": true, "path": "..." }`. Show the user the path and ask: *"I found a .env at `<path>` — OK to use this for the Cognigy connection?"* If confirmed, re-run adding `--env-path <path>`. If declined, stop.
    - **Exit 1** — error. Show the `error` field.
+     - `No .env file found` → invoke the `cognigy:init` skill to set up the connection, then retry this command
 
 ## Notes
 

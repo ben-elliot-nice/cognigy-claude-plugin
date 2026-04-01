@@ -28,6 +28,7 @@ npx tsx <plugin-root>/cli/src/index.ts create <resource> --name "My Resource" [-
    - **Exit 0** — success. The JSON output contains the created resource including its `_id`. Capture the `_id` if this is part of a composite workflow.
    - **Exit 2** — `.env` found via git root walk. Output contains `{ "requiresConfirmation": true, "path": "..." }`. Show the user the path and ask: *"I found a .env at `<path>` — OK to use this for the Cognigy connection?"* If confirmed, re-run adding `--env-path <path>`. If declined, stop.
    - **Exit 1** — error. Show the `error` field.
+     - `No .env file found` → invoke the `cognigy:init` skill to set up the connection, then retry this command
      - `projectId is required` → set `COGNIGY_PROJECT_ID` in `.env` or pass `--projectId`
 
 ## Notes

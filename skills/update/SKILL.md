@@ -33,6 +33,7 @@ npx tsx <plugin-root>/cli/src/index.ts update <resource> <id> --<field> <value> 
    - **Exit 0** — success. JSON output contains the updated resource.
    - **Exit 2** — `.env` found via git root walk. Output contains `{ "requiresConfirmation": true, "path": "..." }`. Show the user the path and ask: *"I found a .env at `<path>` — OK to use this for the Cognigy connection?"* If confirmed, re-run adding `--env-path <path>`. If declined, stop.
    - **Exit 1** — error. Show the `error` field.
+     - `No .env file found` → invoke the `cognigy:init` skill to set up the connection, then retry this command
 
 ## Notes
 
