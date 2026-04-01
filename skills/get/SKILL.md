@@ -30,7 +30,7 @@ npx tsx <plugin-root>/cli/src/index.ts get <resource> <id>
    - **Exit 1** — error. Show the `error` field.
      - `No .env file found` → invoke the `cognigy:init` skill to set up the connection, then retry this command
      - `API error 401` → token invalid or expired
-     - `Unknown resource` → resource type not yet supported
+     - `Unknown resource` → invoke `/private:cognigy-generate-resource` to add support, then retry. If that skill is not installed, stop and tell the user the resource is not yet supported.
 
 ## Notes
 
