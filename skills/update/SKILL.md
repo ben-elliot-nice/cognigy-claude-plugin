@@ -1,4 +1,5 @@
 ---
+name: update
 description: Update an existing Cognigy resource by ID
 ---
 
@@ -10,18 +11,22 @@ Update fields on an existing Cognigy resource.
 
 Use this skill when the user wants to modify a resource they already have an ID for. If the ID is unknown, use `list` or `get` first.
 
+## Finding the CLI
+
+When Claude Code loads this skill, it injects `Base directory for this skill: <path>` into context. That path ends in `skills/update`. Go two directories up to get the plugin root. The CLI entry point is `<plugin-root>/cli/src/index.ts`.
+
 ## Steps
 
 1. Identify the resource type, ID, and fields to update.
 
-2. Run the CLI:
+2. Derive `<plugin-root>` from the `Base directory for this skill:` path (two directories up). Run the CLI:
 ```bash
-npx tsx ~/.claude/plugins/cognigy-claude-plugin/cli/src/index.ts update <resource> <id> --<field> <value> [--<field> <value> ...]
+npx tsx <plugin-root>/cli/src/index.ts update <resource> <id> --<field> <value> [--<field> <value> ...]
 ```
 
    Example — rename a flow:
    ```bash
-   npx tsx ~/.claude/plugins/cognigy-claude-plugin/cli/src/index.ts update flow flow-abc123 --name "Better Name"
+   npx tsx <plugin-root>/cli/src/index.ts update flow flow-abc123 --name "Better Name"
    ```
 
 3. Check the result:

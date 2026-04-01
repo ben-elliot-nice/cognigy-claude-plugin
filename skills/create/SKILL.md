@@ -1,4 +1,5 @@
 ---
+name: create
 description: Create a new Cognigy resource
 ---
 
@@ -10,13 +11,17 @@ Create a new Cognigy resource.
 
 Use this skill when the user wants to create a new resource.
 
+## Finding the CLI
+
+When Claude Code loads this skill, it injects `Base directory for this skill: <path>` into context. That path ends in `skills/create`. Go two directories up to get the plugin root. The CLI entry point is `<plugin-root>/cli/src/index.ts`.
+
 ## Steps
 
 1. Identify the resource type and required fields. Ask the user for any required fields that are missing before proceeding. Check `cli/src/resources/<resource>.ts` in the plugin directory for the fields each resource accepts. Do not invent field names.
 
-2. Run the CLI:
+2. Derive `<plugin-root>` from the `Base directory for this skill:` path (two directories up). Run the CLI:
 ```bash
-npx tsx ~/.claude/plugins/cognigy-claude-plugin/cli/src/index.ts create <resource> --name "My Resource" [--field value ...]
+npx tsx <plugin-root>/cli/src/index.ts create <resource> --name "My Resource" [--field value ...]
 ```
 
 3. Check the result:

@@ -1,4 +1,5 @@
 ---
+name: delete
 description: Delete a Cognigy resource by ID — irreversible, always confirm first
 ---
 
@@ -10,15 +11,19 @@ Delete a Cognigy resource. **This is irreversible.**
 
 Use this skill only when the user explicitly asks to delete a resource.
 
+## Finding the CLI
+
+When Claude Code loads this skill, it injects `Base directory for this skill: <path>` into context. That path ends in `skills/delete`. Go two directories up to get the plugin root. The CLI entry point is `<plugin-root>/cli/src/index.ts`.
+
 ## Steps
 
 1. Identify the resource type and ID.
 
 2. **Always confirm before deleting.** Ask: *"Are you sure you want to delete `<resource>` `<id>`? This cannot be undone."* Do not proceed until the user explicitly confirms.
 
-3. Run the CLI:
+3. Derive `<plugin-root>` from the `Base directory for this skill:` path (two directories up). Run the CLI:
 ```bash
-npx tsx ~/.claude/plugins/cognigy-claude-plugin/cli/src/index.ts delete <resource> <id>
+npx tsx <plugin-root>/cli/src/index.ts delete <resource> <id>
 ```
 
 4. Check the result:
