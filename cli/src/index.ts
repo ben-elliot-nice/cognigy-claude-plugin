@@ -98,7 +98,9 @@ async function main(): Promise<void> {
   const env = loadEnv(envPath)
   const client = createClient(env)
 
-  const handlers = registry[resource]
+  // Accept plural resource names (e.g. "projects" → "project")
+  const resolvedResource = registry[resource] ? resource : resource.replace(/s$/, '')
+  const handlers = registry[resolvedResource]
   if (!handlers) {
     fail(`Unknown resource: "${resource}". Available: ${Object.keys(registry).join(', ') || 'none registered yet'}`)
   }
@@ -133,7 +135,7 @@ async function main(): Promise<void> {
       if (!id) fail(`delete requires an ID: cognigy delete ${resource} <id>`)
       if (!handlers.delete) fail(`Resource "${resource}" does not support delete`)
       await handlers.delete(id, client, env)
-      output({ deleted: true, resource, id })
+      output({ deleted: true, resource: resolvedResource, id })
       break
     }
     default:
