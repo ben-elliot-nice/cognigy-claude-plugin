@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { findEnvFile, loadEnv } from './lib/env.js'
 import { createClient } from './lib/client.js'
-import type { ResourceRegistry } from './lib/types.js'
+import type { ResourceHandlers, ResourceRegistry } from './lib/types.js'
 import { flows } from './resources/flows.js'
 import { projects } from './resources/projects.js'
 import { charts } from './resources/charts.js'
@@ -27,6 +27,18 @@ function parseFlags(args: string[]): Record<string, string> {
     }
   }
   return flags
+}
+
+function toEnvVarName(camelKey: string): string {
+  return 'COGNIGY_' + camelKey.replace(/([A-Z])/g, '_$1').toUpperCase()
+}
+
+function validateRequires(resource: string, handlers: ResourceHandlers, flags: Record<string, string>, env: Record<string, string | undefined>): void {
+  for (const key of (handlers.requires ?? [])) {
+    if (!flags[key] && !env[key]) {
+      fail(`'${resource}' requires --${key} or ${toEnvVarName(key)} to be set`)
+    }
+  }
 }
 
 async function runInit(): Promise<void> {
@@ -90,7 +102,6 @@ async function main(): Promise<void> {
       fail('No .env file found. Run: cognigy init')
     }
     if (found.fromWalk) {
-      // Signal to skill that user confirmation is needed
       output({ requiresConfirmation: true, path: found.path })
       process.exit(2)
     }
@@ -107,19 +118,23 @@ async function main(): Promise<void> {
     fail(`Unknown resource: "${resource}". Available: ${Object.keys(registry).join(', ') || 'none registered yet'}`)
   }
 
+  // Validate required parent IDs before dispatch
+  validateRequires(resolvedResource, handlers, flags, env as unknown as Record<string, string | undefined>)
+
   // Determine if thirdArg is an ID (not a flag)
   const id = thirdArg && !thirdArg.startsWith('--') ? thirdArg : undefined
 
   switch (verb) {
     case 'list': {
       if (!handlers.list) fail(`Resource "${resource}" does not support list`)
-      output(await handlers.list(client, env))
+      output(await handlers.list(client, env, flags))
       break
     }
     case 'get': {
-      if (!id) fail(`get requires an ID: cognigy get ${resource} <id>`)
+      // Resources with `requires` use params for identification — no positional ID needed
+      if (!handlers.requires?.length && !id) fail(`get requires an ID: cognigy get ${resource} <id>`)
       if (!handlers.get) fail(`Resource "${resource}" does not support get`)
-      output(await handlers.get(id, client, env))
+      output(await handlers.get(id ?? '', client, env, flags))
       break
     }
     case 'create': {
@@ -136,12 +151,26 @@ async function main(): Promise<void> {
     case 'delete': {
       if (!id) fail(`delete requires an ID: cognigy delete ${resource} <id>`)
       if (!handlers.delete) fail(`Resource "${resource}" does not support delete`)
-      await handlers.delete(id, client, env)
+      await handlers.delete(id, client, env, flags)
       output({ deleted: true, resource: resolvedResource, id })
       break
     }
+    case 'invoke': {
+      if (!id) fail(`invoke requires an ID: cognigy invoke ${resource} <id> --op <operation>`)
+      const op = flags['op']
+      if (!op) fail(`invoke requires --op <operation>: cognigy invoke ${resource} <id> --op <operation>`)
+      delete flags['op']  // don't forward meta-flag to operation handler
+      if (!handlers.operations) fail(`Resource "${resource}" has no operations`)
+      const handler = handlers.operations[op]
+      if (!handler) {
+        const available = Object.keys(handlers.operations).join(', ')
+        fail(`Resource "${resource}" has no operation "${op}". Available: ${available}`)
+      }
+      output(await handler(id, flags, client, env))
+      break
+    }
     default:
-      fail(`Unknown verb: "${verb}". Valid verbs: list, get, create, update, delete`)
+      fail(`Unknown verb: "${verb}". Valid verbs: list, get, create, update, delete, invoke`)
   }
 }
 
