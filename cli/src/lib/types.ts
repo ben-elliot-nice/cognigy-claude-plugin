@@ -12,12 +12,21 @@ export interface CognigyClient {
   delete(path: string): Promise<void>
 }
 
+export type OperationHandler = (
+  id: string,
+  params: Record<string, string>,
+  client: CognigyClient,
+  env: EnvConfig
+) => Promise<unknown>
+
 export type ResourceHandlers = {
-  list?: (client: CognigyClient, env: EnvConfig) => Promise<unknown>
-  get?: (id: string, client: CognigyClient, env: EnvConfig) => Promise<unknown>
+  requires?: string[]
+  list?: (client: CognigyClient, env: EnvConfig, params: Record<string, string>) => Promise<unknown>
+  get?: (id: string, client: CognigyClient, env: EnvConfig, params: Record<string, string>) => Promise<unknown>
   create?: (params: Record<string, string>, client: CognigyClient, env: EnvConfig) => Promise<unknown>
   update?: (id: string, params: Record<string, string>, client: CognigyClient, env: EnvConfig) => Promise<unknown>
-  delete?: (id: string, client: CognigyClient, env: EnvConfig) => Promise<void>
+  delete?: (id: string, client: CognigyClient, env: EnvConfig, params: Record<string, string>) => Promise<void>
+  operations?: Record<string, OperationHandler>
 }
 
 export type ResourceRegistry = Record<string, ResourceHandlers>
