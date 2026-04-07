@@ -1,4 +1,4 @@
-import type { CognigyClient, EnvConfig, ResourceHandlers } from '../lib/types.js'
+import type { ResourceHandlers } from '../lib/types.js'
 
 interface ChartNode {
   _id: string
@@ -19,7 +19,11 @@ interface Chart {
 }
 
 export const charts: ResourceHandlers = {
-  async get(id, client) {
-    return client.get<Chart>(`/flows/${id}/chart`)
+  requires: ['flowId'],
+
+  async get(_id, client, env, params) {
+    const flowId = params['flowId'] ?? env.flowId
+    if (!flowId) throw new Error('flowId is required — set COGNIGY_FLOW_ID in .env or pass --flowId')
+    return client.get<Chart>(`/flows/${flowId}/chart`)
   },
 }
