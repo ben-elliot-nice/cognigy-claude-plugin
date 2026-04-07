@@ -31,4 +31,10 @@ export const flows: ResourceHandlers = {
   async delete(id, client) {
     return client.delete(`/flows/${id}`)
   },
+
+  operations: {
+    async clone(id, _params, client) {
+      return client.post<Flow>(`/flows/${id}/clone`, {})
+    },
+  },
 }

@@ -81,3 +81,13 @@ describe('flows.delete', () => {
     expect(client.delete).toHaveBeenCalledWith('/flows/flow-abc')
   })
 })
+
+describe('flows.operations.clone', () => {
+  it('calls POST /flows/:id/clone with empty body', async () => {
+    const client = makeClient()
+    const op = flows.operations?.['clone']
+    expect(op).toBeDefined()
+    await op!('flow-abc', {}, client, env)
+    expect(client.post).toHaveBeenCalledWith('/flows/flow-abc/clone', {})
+  })
+})
