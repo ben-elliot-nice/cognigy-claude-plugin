@@ -15,11 +15,15 @@ Use this skill when the user wants to fetch a specific resource and has (or can 
 
 When Claude Code loads this skill, it injects `Base directory for this skill: <path>` into context. That path ends in `skills/get`. Go two directories up to get the plugin root. The CLI entry point is `<plugin-root>/cli/src/index.ts`.
 
+## IMPORTANT
+
+**Do NOT read any source files before running the CLI.** The CLI will surface exactly what is missing in its error output. Reading handler files is wasted effort — the error message already tells you what to do.
+
 ## Steps
 
-1. Identify the resource type and any IDs or flags you already have from the user's request.
+1. Identify the resource type and any IDs or flags already provided by the user.
 
-2. Derive `<plugin-root>` from the `Base directory for this skill:` path (two directories up). Run the CLI immediately with whatever you have — do not pre-inspect handler files or ask the user for information before attempting:
+2. Derive `<plugin-root>` from the `Base directory for this skill:` path (two directories up). Run the CLI immediately:
 
 ```bash
 npx tsx <plugin-root>/cli/src/index.ts get <resource> [id] [--flag value ...]
@@ -37,6 +41,7 @@ npx tsx <plugin-root>/cli/src/index.ts get <resource> [id] [--flag value ...]
 
 ## Notes
 
-- Do not ask the user for IDs or flags before attempting — required values may already be set in `.env`. Let the CLI surface what's missing.
+- **Never read source files before running.** The CLI error output is authoritative — it tells you exactly what flag or ID is missing.
+- Do not ask the user for IDs or flags before attempting — required values may already be set in `.env`.
 - Do not guess IDs. If the user doesn't have an ID and the CLI doesn't surface it, use the `list` skill to find it.
 - Capture the `_id` field from the result if this is part of a composite workflow.
