@@ -5,12 +5,14 @@ import type { ResourceHandlers, ResourceRegistry } from './lib/types.js'
 import { flows } from './resources/flows.js'
 import { projects } from './resources/projects.js'
 import { charts } from './resources/charts.js'
+import { nodes } from './resources/nodes.js'
 
 // Resource registry — add new modules here as they're generated
 const registry: ResourceRegistry = {
   flow: flows,
   project: projects,
   chart: charts,
+  node: nodes,
 }
 
 function parseFlags(args: string[]): Record<string, string> {
