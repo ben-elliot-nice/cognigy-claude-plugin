@@ -15,10 +15,15 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const resourceName = process.argv[2]
 if (!resourceName || resourceName.includes('/') || resourceName.includes('.')) {
-  console.error('Usage: npx tsx scripts/extract-resource-types.ts <resource>')
+  console.error('Usage: npx tsx scripts/extract-resource-types.ts <resource> [--path /v2.0/parent/{parentId}/resource]')
   console.error('Example: npx tsx scripts/extract-resource-types.ts flow')
+  console.error('Example: npx tsx scripts/extract-resource-types.ts node --path /v2.0/flows/{flowId}/chart/nodes')
   process.exit(1)
 }
+
+// Optional --path flag to bypass auto-discovery for sub-resources
+const pathFlagIndex = process.argv.indexOf('--path')
+const explicitCollectionPath: string | undefined = pathFlagIndex !== -1 ? process.argv[pathFlagIndex + 1] : undefined
 
 const Resource = resourceName.charAt(0).toUpperCase() + resourceName.slice(1)
 
@@ -61,6 +66,28 @@ function findPaths(resourceName: string): FoundPaths {
 
   if (recordCandidates.length === 0) {
     console.error(`No record path found for collection "${collectionPath}".`)
+    process.exit(1)
+  }
+
+  return { collectionPath, recordPath: recordCandidates[0] }
+}
+
+function resolveExplicitPath(collectionPath: string): FoundPaths {
+  const allPaths = Object.keys(spec.paths)
+
+  if (!allPaths.includes(collectionPath)) {
+    console.error(`Path "${collectionPath}" not found in spec.`)
+    console.error('Check the path exactly — it must match a key in the OpenAPI spec.')
+    process.exit(1)
+  }
+
+  const recordCandidates = allPaths.filter(p =>
+    p.startsWith(collectionPath + '/') &&
+    p.slice(collectionPath.length + 1).match(/^\{[^/]+\}$/)
+  )
+
+  if (recordCandidates.length === 0) {
+    console.error(`No record path found under "${collectionPath}".`)
     process.exit(1)
   }
 
@@ -177,7 +204,9 @@ function generateInterface(name: string, schema: any, allOptional: boolean): str
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 
-const { collectionPath, recordPath } = findPaths(resourceName)
+const { collectionPath, recordPath } = explicitCollectionPath
+  ? resolveExplicitPath(explicitCollectionPath)
+  : findPaths(resourceName)
 
 const getSchema    = extractSchema(recordPath, 'get', 'response')
 const postSchema   = extractSchema(collectionPath, 'post', 'requestBody')
