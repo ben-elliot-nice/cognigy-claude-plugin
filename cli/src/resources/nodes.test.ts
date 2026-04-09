@@ -102,6 +102,12 @@ describe('nodes.update', () => {
     await nodes.update!('node-xyz', { label: 'Renamed', flowId: 'flow-abc' }, client, env)
     expect(client.patch).toHaveBeenCalledWith('/flows/flow-abc/chart/nodes/node-xyz', { label: 'Renamed' })
   })
+
+  it('throws when flowId is missing from both params and env', async () => {
+    const client = makeClient()
+    const envWithout: EnvConfig = { baseUrl: 'x', apiToken: 'y' }
+    await expect(nodes.update!('node-xyz', { label: 'Renamed' }, client, envWithout)).rejects.toThrow('flowId is required')
+  })
 })
 
 describe('nodes.delete', () => {
